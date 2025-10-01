@@ -1,0 +1,90 @@
+
+import datetime
+date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+while True:
+    print('Add/List/Delete/Quit') # 'a', 'l', 'd' or 'q' 
+    select = input('What do you want: ').lower()
+
+    if select == 'a':
+        name = input('Enter name: ')
+        age = input('Enter age: ')
+        score = input('Enter score: ')
+
+        with open('deneme.txt', 'a') as file:
+            file.write(' '.join([name, age, score]) + '\n')
+            print(f'{name.capitalize()} added successfully!')
+            
+            date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with open('log.txt', 'a') as log:
+                log.write(f'{date} - User added a record: Name={name}, Age={age}, Score={score}\n\n')
+    
+    elif select == 'd':
+        delete = input('Enter the name to delete: ')
+
+        confirm = input(f'Are you sure you want to delete "{delete}"? (yes/no): ').lower()
+        if confirm != 'yes':
+            print('Deletion canceled.\n')
+            continue
+
+        try:
+            with open('deneme.txt', 'r') as file:
+                lines = file.readlines()
+
+            if not lines:
+                print('List is empty. Nothing to delete.\n')
+                continue
+
+            with open('deneme.txt', 'w') as file:
+                found = False
+                deleted_age = deleted_score = None
+                for line in lines:
+                    name, age, score = line.strip().split()
+                    if name.lower() != delete.lower():
+                        file.write(line)
+                    else:
+                        found = True
+                        deleted_age = age
+                        deleted_score = score
+
+            if found:
+                print(f'{delete.capitalize()} deleted successfully!')
+                with open('log.txt', 'a') as log:
+                    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    log.write(f'{date} - User deleted record: Name={delete}, Age={deleted_age}, Score={deleted_score}\n\n')
+            else:
+                print('No such record found.\n')
+
+        except FileNotFoundError:
+            print('No student records found.\n')
+
+
+    elif select == 'l':
+        try:
+            with open('deneme.txt', 'r') as file:
+                lines = file.readlines()
+
+            if not lines:
+                print('Student list is empty.\n')
+            else:
+                print('\n-- Student List --')
+                for line in lines:
+                    name, age, score = line.strip().split()
+                    print(f'Name: {name}, Age: {age}, Score: {score}')
+                print('------------------\n')
+
+            date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with open('log.txt', 'a') as log:
+                log.write(f'{date} - User viewed the list.\n\n')
+                
+        except FileNotFoundError:
+            print('No student records found.\n')
+
+    elif select == 'q':
+        print('Exiting program...')
+        with open('log.txt', 'a') as log:
+            date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log.write(f'{date} - User exited the program.\n\n\n')
+        break
+    else:
+        print('Invalid enter, try again.\n')
